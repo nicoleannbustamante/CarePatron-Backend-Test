@@ -1,6 +1,6 @@
-﻿using api.Models;
+﻿using Domain.Aggregates.Clients;
 
-namespace api.Data
+namespace Infrastructure.EFCore.Data
 {
     public class DataSeeder
     {
@@ -13,7 +13,7 @@ namespace api.Data
 
         public void Seed()
         {
-            var client = new Client("xosiosiosdhad", "John", "Smith", "john@gmail.com", "+18202820232");
+            var client = new Client( "John", "Smith", "john@gmail.com", "+18202820232");
 
             dataContext.Add(client);
             dataContext.SaveChanges();
