@@ -1,1 +1,1 @@
-# [Visit the wiki](https://github.com/Carepatron/Carepatron-Test-Full/wiki)
+Updated the API project using the following technologies: Clean Architecture, DDD, CQRS, EF Core, AutoMapper, FluentValdation
