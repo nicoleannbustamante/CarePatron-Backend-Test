@@ -1,6 +1,7 @@
-﻿using api.Data;
-using api.Repositories;
-using Microsoft.EntityFrameworkCore;
+﻿using Application;
+using Infrastructure;
+using Infrastructure.EFCore.Data;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,7 @@ var services = builder.Services;
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
+services.AddSwaggerGen(opts => opts.EnableAnnotations());
 
 // cors
 services.AddCors(options =>
@@ -23,13 +24,11 @@ services.AddCors(options =>
         .Build());
 });
 
-// ioc
-services.AddDbContext<DataContext>(options => options.UseInMemoryDatabase(databaseName: "Test"));
+services.AddControllers();
 
-services.AddScoped<DataSeeder>();
-services.AddScoped<IClientRepository, ClientRepository>();
-services.AddScoped<IEmailRepository, EmailRepository>();
-services.AddScoped<IDocumentRepository, DocumentRepository>();
+services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+services.AddApplication();
+services.AddInfrastructure();
 
 var app = builder.Build();
 
@@ -38,14 +37,23 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "CarePatron Test v1");
+        options.RoutePrefix = "swagger"; // Change this URL path as needed
+    });
 }
 
-app.MapGet("/clients", async (IClientRepository clientRepository) =>
+// configure HTTP request pipeline
 {
-    return await clientRepository.Get();
-})
-.WithName("get clients");
+    app.MapControllers();
+}
+
+//app.MapGet("/clients", async (IClientRepository clientRepository) =>
+//{
+//    return await clientRepository.Get();
+//})
+//.WithName("get clients");
 
 app.UseCors();
 
